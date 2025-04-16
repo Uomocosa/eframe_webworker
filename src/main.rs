@@ -51,6 +51,39 @@ fn main() {
         // big_calculation(1_000_000).await; // THIS BLOCKS THE MAIN THREAD!
     });
 
+    use gloo_worker::{HandlerId, Registrable, Spawnable, Worker, WorkerScope};
+
+    pub struct Multiplier {}
+
+    impl Worker for Multiplier {
+        type Input = (u64, u64);
+        type Message = ();
+        type Output = ((u64, u64), u64);
+
+        fn create(_scope: &WorkerScope<Self>) -> Self {
+            Self {}
+        }
+
+        fn update(&mut self, _scope: &WorkerScope<Self>, _msg: Self::Message) {}
+
+        fn received(&mut self, scope: &WorkerScope<Self>, msg: Self::Input, id: HandlerId) {
+            scope.respond(id, (msg, msg.0 * msg.1));
+        }
+    }
+
+    Multiplier::registrar().register();
+    
+    let bridge = Multiplier::spawner()
+        .callback(move |((a, b), result)| {
+            log::info!("{a} * {b} = {result}");
+        })
+        .spawn("./worker.js");
+    let bridge = Box::leak(Box::new(bridge));
+
+    bridge.send((2, 5));
+    bridge.send((3, 3));
+    bridge.send((50, 5));
+
     // wasm_bindgen_futures::spawn_local(async {
     //     big_calculation(1_000_000_000).await; // THIS ALSO BLOCKS THE MAIN THREAD!
     // });
