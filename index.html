@@ -16,10 +16,14 @@
 
     <link data-trunk rel="icon" href="assets/favicon.ico">
 
-
-    <link data-trunk rel="copy-file" href="assets/sw.js"/>
+    <!-- my functions to import to js -->
     <link data-trunk rel="copy-file" href="assets/__hello_from_js__.js"/>
     <link data-trunk rel="copy-file" href="assets/__call_rust_from_js__.js"/>
+    <link data-trunk rel="copy-file" href="assets/__call_rust_function__.js"/>
+    <link data-trunk rel="copy-file" href="assets/__worker_v1__.js"/>
+    
+    <!-- from eframe_template -->
+    <link data-trunk rel="copy-file" href="assets/sw.js"/>
     <link data-trunk rel="copy-file" href="assets/manifest.json"/>
     <link data-trunk rel="copy-file" href="assets/icon-1024.png" data-target-path="assets"/>
     <link data-trunk rel="copy-file" href="assets/icon-256.png" data-target-path="assets"/>
@@ -149,6 +153,8 @@
     <script type="module" src="v2.js"></script>
     <script type="module" src="__hello_from_js__.js"></script>
     <script type="module" src="__call_rust_from_js__.js"></script>
+    <script type="module" src="__call_rust_function__.js"></script>
+    <script type="module" src="__worker_v1__.js"></script>
 
 </body>
 

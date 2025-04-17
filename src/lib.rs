@@ -8,3 +8,9 @@ use wasm_bindgen::prelude::*;
 pub fn hello_world() {
     log::info!(">f> hello_world");
 } 
+
+mod rust_function;
+pub use rust_function::rust_function;
+
+mod worker_v1;
+pub use worker_v1::worker_v1;
