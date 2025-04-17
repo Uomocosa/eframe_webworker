@@ -4,6 +4,39 @@
 // #[cfg(target_arch = "wasm32")]
 // use wasm_bindgen::prelude::*;
 
+
+#[cfg(target_arch = "wasm32")]
+use js_sys::Array;
+// use wasm_bindgen::{prelude::*, JsCast};
+use web_sys::{window, Blob, BlobPropertyBag, Url, Worker};
+
+fn worker_new(name: &str) -> Worker {
+    let origin = window()
+        .expect("window to be available")
+        .location()
+        .origin()
+        .expect("origin to be available");
+
+    let script = Array::new();
+    script.push(
+        &format!(r#"importScripts("{origin}/{name}.js");wasm_bindgen("{origin}/{name}_bg.wasm");"#)
+            .into(),
+    );
+
+    let options = BlobPropertyBag::new();
+    options.set_type("text/javascript");
+    let blob = Blob::new_with_str_sequence_and_options(
+        &script,
+        &options,
+    )
+    .expect("blob creation succeeds");
+
+    let url = Url::create_object_url_with_blob(&blob).expect("url creation succeeds");
+
+    Worker::new(&url).expect("failed to spawn worker")
+}
+
+
 // When compiling to web using trunk:
 #[cfg(target_arch = "wasm32")]
 fn main() {
@@ -49,6 +82,10 @@ fn main() {
             }
         }
     });
+
+    let worker = worker_new("worker");
+    let worker_clone = worker.clone();
+    log::info!("worker_clone: {worker_clone:#?}");
 
     log::info!(">>> main ended");
 }
