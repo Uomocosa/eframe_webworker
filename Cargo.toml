@@ -38,7 +38,16 @@ libp2p-webrtc-websys = "0.4"
 tracing-wasm = "0.2.1"
 wasm-bindgen = "0.2.90"
 wasm-bindgen-futures = "0.4.42"
-web-sys = { version = "0.3", features = ['Document', 'Element', 'HtmlElement', 'Node', 'Response', 'Window'] }
+web-sys = { version = "0.3", features = [
+    'Document', 
+    'Element', 
+    'HtmlElement', 
+    'Node', 
+    'Response', 
+    'Window', 
+    'Worker',
+    'DedicatedWorkerGlobalScope',
+] }
 # gloo-worker = "0.5"
 
 

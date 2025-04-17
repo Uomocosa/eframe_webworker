@@ -10,7 +10,7 @@
     <title>eframe_webworker</title>
 
     <!-- config for our rust wasm binary. go to https://trunkrs.dev/assets/#rust for more customization -->
-    <link data-trunk rel="rust" data-wasm-opt="2" />
+    <!-- <link data-trunk rel="rust" data-wasm-opt="2" /> -->
     <!-- this is the base url relative to which other urls will be constructed. trunk will insert this from the public-url option -->
     <base data-trunk-public-url />
 
@@ -23,7 +23,6 @@
     <link data-trunk rel="copy-file" href="assets/icon-256.png" data-target-path="assets"/>
     <link data-trunk rel="copy-file" href="assets/icon_ios_touch_192.png" data-target-path="assets"/>
     <link data-trunk rel="copy-file" href="assets/maskable_icon_x512.png" data-target-path="assets"/>
-
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icon_ios_touch_192.png">
@@ -131,6 +130,9 @@
         <div class="lds-dual-ring"></div>
     </div>
 
+    <link data-trunk rel="rust" href="Cargo.toml" data-wasm-opt="z" data-bin="eframe_webworker" data-type="main" />
+    <link data-trunk rel="rust" href="Cargo.toml" data-wasm-opt="z" data-bin="worker" data-type="worker" />
+
     <!--Register Service Worker. this will cache the wasm / js scripts for offline use (for PWA functionality). -->
     <!-- Force refresh (Ctrl + F5) to load the latest files instead of cached files  -->
     <script>        
@@ -141,57 +143,5 @@
             });
         }
     </script>
-
-    <!-- Make `wasm_bindgen` available for my other scripts -->
-    <!-- Note that there is no `type="module"` in the script tag -->
-    <script type="module" src="./eframe_webworker.js"></script>
-
-    <script>
-        // Example of a simple call of a rust function
-        // This approach will be useful for calling WebWorkers
-        // Tested on GitHub Pages: Works!
-        console.log(">>> start ...");
-        async function run_wasm() {
-            console.log('>>> waiting for Event(TrunkApplicationStarted) ...');
-            // Wait for the TrunkApplicationStarted event which indicates WASM is initialized
-            await new Promise((resolve) => {
-                window.addEventListener("TrunkApplicationStarted", resolve, { once: true });
-            });
-            console.log('>>> Event(TrunkApplicationStarted) received.');
-            // Now you can safely access the WASM bindings
-            if (window.wasmBindings && window.wasmBindings.hello_world) {
-                console.log(window.wasmBindings.hello_world);
-                window.wasmBindings.hello_world();
-            } else {
-                console.error("~!~ WASM bindings or hello_world function not found.");
-            }
-        }
-        run_wasm();
-    </script>
-
-    <script>
-        // It also works for functions not defined in lib
-        console.log(">>> start ...");
-        async function run_wasm() {
-            console.log('>>> waiting for Event(TrunkApplicationStarted) ...');
-            // Wait for the TrunkApplicationStarted event which indicates WASM is initialized
-            await new Promise((resolve) => {
-                window.addEventListener("TrunkApplicationStarted", resolve, { once: true });
-            });
-            console.log('>>> Event(TrunkApplicationStarted) received.');
-            // Now you can safely access the WASM bindings
-            if (window.wasmBindings && window.wasmBindings.rust_function) {
-                console.log(window.wasmBindings.rust_function);
-                window.wasmBindings.rust_function();
-            } else {
-                console.error("~!~ WASM bindings or rust_function not found.");
-            }
-        }
-        run_wasm();
-    </script>
-
-</body>
-
-</html>
 
 <!-- Powered by egui: https://github.com/emilk/egui/ -->
