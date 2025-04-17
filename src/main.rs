@@ -30,7 +30,7 @@ fn main() {
             .start(
                 canvas,
                 web_options,
-                Box::new(|cc| Ok(Box::new(v2::TemplateApp::new(cc)))),
+                Box::new(|cc| Ok(Box::new(eframe_webworker::TemplateApp::new(cc)))),
             )
             .await;
 
@@ -70,9 +70,9 @@ fn main() -> eframe::Result {
         ..Default::default()
     };
     eframe::run_native(
-        "v2",
+        "eframe_webworker",
         native_options,
-        Box::new(|cc| Ok(Box::new(v2::TemplateApp::new(cc)))),
+        Box::new(|cc| Ok(Box::new(eframe_webworker::TemplateApp::new(cc)))),
     )
 }
 

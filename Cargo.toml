@@ -1,5 +1,5 @@
 [package]
-name = "v2"
+name = "eframe_webworker"
 version = "0.1.0"
 authors = ["lele"]
 edition = "2024"
