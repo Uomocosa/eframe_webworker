@@ -41,6 +41,8 @@ fn worker_new(name: &str) -> Worker {
 #[cfg(target_arch = "wasm32")]
 fn main() {
     use eframe::wasm_bindgen::JsCast as _;
+    use wasm_bindgen::prelude::Closure;
+    use web_sys::MessageEvent;
     // Redirect `log` message to `console.log` and friends:
     eframe::WebLogger::init(log::LevelFilter::Debug).ok();
     log::info!(">f> main");
@@ -86,6 +88,51 @@ fn main() {
     let worker = worker_new("worker");
     let worker_clone = worker.clone();
     log::info!("worker_clone: {worker_clone:#?}");
+
+    // NOTE: We must wait for the worker to report that it's ready to receive
+    //       messages. Any message we send beforehand will be discarded / ignored.
+    //       This is different from js-based workers, which can send messages
+    //       before the worker is initialized.
+    //       REASON: This is because javascript only starts processing MessageEvents
+    //       once the worker's script first yields to the javascript event loop.
+    //       For js workers this means that you can register the event listener
+    //       as first thing in the worker and will receive all previously sent
+    //       message events. However, loading wasm is an asynchronous operation
+    //       which yields to the js event loop before the wasm is loaded and had
+    //       a change to register the event listener. At that point js processes
+    //       the message events, sees that there isn't any listener registered,
+    //       and drops them.
+
+    let onmessage = Closure::wrap(Box::new(move |msg: MessageEvent| {
+        let worker_clone = worker_clone.clone();
+        let data = Array::from(&msg.data());
+
+        if data.length() == 0 {
+            let msg = Array::new();
+            msg.push(&2.into());
+            msg.push(&5.into());
+            worker_clone
+                .post_message(&msg.into())
+                .expect("sending message to succeed");
+        } else {
+            let a = data
+                .get(0)
+                .as_f64()
+                .expect("first array value to be a number") as u32;
+            let b = data
+                .get(1)
+                .as_f64()
+                .expect("second array value to be a number") as u32;
+            let result = data
+                .get(2)
+                .as_f64()
+                .expect("third array value to be a number") as u32;
+
+            web_sys::console::log_1(&format!("{a} x {b} = {result}").into());
+        }
+    }) as Box<dyn Fn(MessageEvent)>);
+    worker.set_onmessage(Some(onmessage.as_ref().unchecked_ref()));
+    onmessage.forget();
 
     log::info!(">>> main ended");
 }
