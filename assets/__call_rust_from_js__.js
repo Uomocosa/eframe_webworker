@@ -1,20 +1,20 @@
 console.log("start ...");
 
-// We only need `startup` here which is the main entry point
-// In theory, we could also use all other functions/struct types from Rust which we have bound with
-// `#[wasm_bindgen]`
-const {hello_world} = wasm_bindgen;
-
 async function run_wasm() {
-    // Load the Wasm file by awaiting the Promise returned by `wasm_bindgen`
-    // `wasm_bindgen` was imported in `index.html`
-    await wasm_bindgen();
+  console.log('index.js loaded');
 
-    console.log('index.js loaded');
+  // Wait for the TrunkApplicationStarted event which indicates WASM is initialized
+  await new Promise((resolve) => {
+    window.addEventListener("TrunkApplicationStarted", resolve, { once: true });
+  });
 
-    // Run main Wasm entry point
-    // This will create a worker from within our Rust code compiled to Wasm
-    hello_world();
+  // Now you can safely access the WASM bindings
+  if (window.wasmBindings && window.wasmBindings.hello_world) {
+    console.log(window.wasmBindings.hello_world);
+    window.wasmBindings.hello_world();
+  } else {
+    console.error("WASM bindings or hello_world function not found.");
+  }
 }
 
 run_wasm();
