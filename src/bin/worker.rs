@@ -12,6 +12,13 @@ pub fn main() {
     let onmessage = Closure::wrap(Box::new(move |msg: MessageEvent| {
         web_sys::console::log_1(&"got message".into());
 
+        let mut count: u32 = 0;
+        loop {
+            // This would stop the main thread, but NOT with WebWorkers :)
+            count += 1;
+            if count >= 1_000_000_000 { break; }
+        }
+
         let data = Array::from(&msg.data());
         let a = data
             .get(0)
