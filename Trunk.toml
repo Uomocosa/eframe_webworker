@@ -1,3 +1,4 @@
 [build]
 filehash = false
-# public_url = "/eframe_webworker/"
+# public_url = "/eframe_webworker/" # DOES NOT WORK
+public_url = "./"
