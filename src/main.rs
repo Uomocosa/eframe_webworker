@@ -49,7 +49,7 @@ fn main() {
             }
         }
     });
-    
+
     log::info!(">>> main ended");
 }
 
@@ -75,4 +75,3 @@ fn main() -> eframe::Result {
         Box::new(|cc| Ok(Box::new(eframe_webworker::TemplateApp::new(cc)))),
     )
 }
-
