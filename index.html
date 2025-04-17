@@ -18,6 +18,8 @@
 
 
     <link data-trunk rel="copy-file" href="assets/sw.js"/>
+    <link data-trunk rel="copy-file" href="assets/__hello_from_js__.js"/>
+    <link data-trunk rel="copy-file" href="assets/__call_rust_from_js__.js"/>
     <link data-trunk rel="copy-file" href="assets/manifest.json"/>
     <link data-trunk rel="copy-file" href="assets/icon-1024.png" data-target-path="assets"/>
     <link data-trunk rel="copy-file" href="assets/icon-256.png" data-target-path="assets"/>
@@ -141,6 +143,13 @@
             });
         }
     </script>
+
+    <!-- Make `wasm_bindgen` available for my other scripts -->
+    <!-- <script src='v2.js'></script> -->
+    <!-- Note that there is no `type="module"` in the script tag -->
+    <script src="__hello_from_js__.js"></script>
+    <script src="__call_rust_from_js__.js"></script>
+
 </body>
 
 </html>

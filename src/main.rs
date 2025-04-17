@@ -1,8 +1,8 @@
 #![warn(clippy::all, rust_2018_idioms)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
+// #[cfg(target_arch = "wasm32")]
+// use wasm_bindgen::prelude::*;
 
 // When compiling to web using trunk:
 #[cfg(target_arch = "wasm32")]
@@ -48,57 +48,9 @@ fn main() {
                 }
             }
         }
-        // big_calculation(1_000_000).await; // THIS BLOCKS THE MAIN THREAD!
     });
-
-    use gloo_worker::{HandlerId, Registrable, Spawnable, Worker, WorkerScope};
-
-    pub struct Multiplier {}
-
-    impl Worker for Multiplier {
-        type Input = (u64, u64);
-        type Message = ();
-        type Output = ((u64, u64), u64);
-
-        fn create(_scope: &WorkerScope<Self>) -> Self {
-            Self {}
-        }
-
-        fn update(&mut self, _scope: &WorkerScope<Self>, _msg: Self::Message) {}
-
-        fn received(&mut self, scope: &WorkerScope<Self>, msg: Self::Input, id: HandlerId) {
-            scope.respond(id, (msg, msg.0 * msg.1));
-        }
-    }
-
-    Multiplier::registrar().register();
     
-    let bridge = Multiplier::spawner()
-        .callback(move |((a, b), result)| {
-            log::info!("{a} * {b} = {result}");
-        })
-        .spawn("./worker.js");
-    let bridge = Box::leak(Box::new(bridge));
-
-    bridge.send((2, 5));
-    bridge.send((3, 3));
-    bridge.send((50, 5));
-
-    // wasm_bindgen_futures::spawn_local(async {
-    //     big_calculation(1_000_000_000).await; // THIS ALSO BLOCKS THE MAIN THREAD!
-    // });
-
     log::info!(">>> main ended");
-}
-
-#[wasm_bindgen]
-pub async fn big_calculation(n: u32) {
-    log::info!(">f> big_calculation");
-    let mut vec_: Vec<u32> = Vec::new();
-    for i in 0..n{
-        vec_.push(i);
-    }
-    log::info!(">>> big_calculation ended");
 }
 
 // When compiling natively:
