@@ -7,6 +7,6 @@
 
 # NOTE:
 
-DO NOT USE THIS AS A TEMPLATE.<br> I have no wish in keeping this up to date,
+**DO NOT USE THIS AS A TEMPLATE**.<br> I have no wish in keeping this up to date,
 and things will become depracated fast, mostly of the libraries used are still
 in their 0.x version.
