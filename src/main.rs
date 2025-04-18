@@ -15,24 +15,22 @@ fn worker_new(name: &str) -> Worker {
         .expect("no global `window`")
         .document()
         .expect("should have a document");
-    let other_origin = document.base_uri()
+    let origin = document.base_uri()
         .expect("base uri gives a result")
         .expect("base uri to be available");
     
-    let origin = window()
-        .expect("window to be available")
-        .location()
-        .origin()
-        .expect("origin to be available");
-
-    log::info!("origin: {origin}");
-    log::info!("other_origin: {other_origin}");
+    // On github pages this gives the ulr 'https://uomocosa.github.io' not what we wanted
+    // let origin = window()
+    //     .expect("window to be available")
+    //     .location()
+    //     .origin()
+    //     .expect("origin to be available");
 
     // let package = std::env!("CARGO_PKG_NAME");
     let script = Array::new();
     script.push(
         // importScripts("{origin}/{name}.js") fails when deployed to github pages
-        &format!(r#"importScripts("{origin}/{name}.js");wasm_bindgen("{origin}/{name}_bg.wasm");"#)
+        &format!(r#"importScripts("{origin}{name}.js");wasm_bindgen("{origin}{name}_bg.wasm");"#)
         // &format!(r#"importScripts("{origin}/{package}/{name}.js");wasm_bindgen("{origin}/{package}/{name}_bg.wasm");"#)
         // &format!(r#"importScripts("{name}.js");wasm_bindgen("{name}_bg.wasm");"#) // DOES NOT WORK
         // &format!(r#"importScripts("/{name}.js");wasm_bindgen("/{name}_bg.wasm");"#) // DOES NOT WORK
