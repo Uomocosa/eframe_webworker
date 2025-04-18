@@ -1,56 +1,37 @@
 #![warn(clippy::all, rust_2018_idioms)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-// #[cfg(target_arch = "wasm32")]
-// use wasm_bindgen::prelude::*;
-
-
 #[cfg(target_arch = "wasm32")]
 use js_sys::Array;
-// use wasm_bindgen::{prelude::*, JsCast};
-use web_sys::{window, Blob, BlobPropertyBag, Url, Worker};
+#[cfg(target_arch = "wasm32")]
+use web_sys::{Blob, BlobPropertyBag, Document, Url, Worker};
 
+#[cfg(target_arch = "wasm32")]
 fn worker_new(name: &str) -> Worker {
-    let document: web_sys::Document = web_sys::window()
+    let document: Document = web_sys::window()
         .expect("no global `window`")
         .document()
         .expect("should have a document");
-    let origin = document.base_uri()
+    let origin = document
+        .base_uri()
         .expect("base uri gives a result")
         .expect("base uri to be available");
-    
-    // On github pages this gives the ulr 'https://uomocosa.github.io' not what we wanted
-    // let origin = window()
-    //     .expect("window to be available")
-    //     .location()
-    //     .origin()
-    //     .expect("origin to be available");
 
-    // let package = std::env!("CARGO_PKG_NAME");
     let script = Array::new();
     script.push(
-        // importScripts("{origin}/{name}.js") fails when deployed to github pages
         &format!(r#"importScripts("{origin}{name}.js");wasm_bindgen("{origin}{name}_bg.wasm");"#)
-        // &format!(r#"importScripts("{origin}/{package}/{name}.js");wasm_bindgen("{origin}/{package}/{name}_bg.wasm");"#)
-        // &format!(r#"importScripts("{name}.js");wasm_bindgen("{name}_bg.wasm");"#) // DOES NOT WORK
-        // &format!(r#"importScripts("/{name}.js");wasm_bindgen("/{name}_bg.wasm");"#) // DOES NOT WORK
-        // &format!(r#"importScripts("./{name}.js");wasm_bindgen("./{name}_bg.wasm");"#) // DOES NOT WORK
             .into(),
     );
 
     let options = BlobPropertyBag::new();
     options.set_type("text/javascript");
-    let blob = Blob::new_with_str_sequence_and_options(
-        &script,
-        &options,
-    )
-    .expect("blob creation succeeds");
+    let blob =
+        Blob::new_with_str_sequence_and_options(&script, &options).expect("blob creation succeeds");
 
     let url = Url::create_object_url_with_blob(&blob).expect("url creation succeeds");
 
     Worker::new(&url).expect("failed to spawn worker")
 }
-
 
 // When compiling to web using trunk:
 #[cfg(target_arch = "wasm32")]

@@ -1,9 +1,11 @@
-#![cfg(target_arch = "wasm32")]
-
+#[cfg(target_arch = "wasm32")] // dont know how to use only one of these :(
 use js_sys::Array;
-use wasm_bindgen::{prelude::*, JsCast};
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::{JsCast, prelude::*};
+#[cfg(target_arch = "wasm32")]
 use web_sys::{DedicatedWorkerGlobalScope, MessageEvent};
 
+#[cfg(target_arch = "wasm32")]
 pub fn main() {
     log::info!(">>> worker starting");
     let scope = DedicatedWorkerGlobalScope::from(JsValue::from(js_sys::global()));
@@ -16,7 +18,9 @@ pub fn main() {
         loop {
             // This would stop the main thread, but NOT with WebWorkers :)
             count += 1;
-            if count >= 1_000_000_000 { break; }
+            if count >= 1_000_000_000 {
+                break;
+            }
         }
 
         let data = Array::from(&msg.data());
@@ -41,4 +45,9 @@ pub fn main() {
     scope
         .post_message(&Array::new().into())
         .expect("posting ready message succeeds");
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn main() {
+    todo!()
 }
